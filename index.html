@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Physics 6091 — My progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --paper:#EDF0F2; --card:#FFFFFF; --ink:#16202B; --ink-2:#4A5A6A; --ink-3:#8496A6;
+  --rule:#CFD8DE; --rule-2:#E4EAEE;
+  --red:#B3243B; --amber:#C97A16; --teal:#0E7C6B; --grey:#9AA9B4;
+  --accent:#16202B;
+  --m0:#B3243B; --m1:#D65C3F; --m2:#C97A16; --m3:#7A9A3C; --m4:#0E7C6B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif; background:var(--paper); color:var(--ink);
+  font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--rule-2) 1px,transparent 1px),linear-gradient(90deg,var(--rule-2) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+input,select{font:inherit;color:inherit}
+
+/* ---------- shell ---------- */
+header{
+  background:var(--ink); color:#fff; padding:0 20px; position:sticky; top:0; z-index:50;
+  display:flex; align-items:stretch; gap:0; border-bottom:2px solid var(--ink);
+}
+.brand{display:flex;align-items:center;gap:10px;padding:13px 20px 13px 0;margin-right:8px}
+.brand b{font-weight:600;letter-spacing:-.2px;font-size:14px}
+.brand span{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A6;letter-spacing:.14em;display:block;margin-top:1px}
+nav{display:flex}
+nav button{
+  padding:0 17px; color:#93A7B8; font-size:12.5px; font-weight:500; letter-spacing:.02em;
+  border-bottom:2px solid transparent; margin-bottom:-2px; transition:color .12s;
+}
+nav button:hover{color:#fff}
+nav button[aria-current=page]{color:#fff;border-bottom-color:#fff}
+.sync{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:11px;color:#7E93A6}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--grey);flex:none}
+.dot.on{background:#2BB673}.dot.err{background:#E5484D}
+.sync button{color:#93A7B8;font-size:11px;border-bottom:1px solid #3E5163;padding-bottom:1px}
+.sync button:hover{color:#fff;border-color:#fff}
+
+main{max-width:1240px;margin:0 auto;padding:22px 20px 90px}
+.view{display:none}.view.on{display:block}
+
+/* ---------- typography ---------- */
+h1{font-size:19px;font-weight:600;letter-spacing:-.35px}
+h2{font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:2px}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:500;
+}
+.sub{color:var(--ink-2);font-size:12.5px}
+.hd{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+
+/* ---------- card ---------- */
+.card{background:var(--card);border:1px solid var(--rule);margin-bottom:16px}
+.card>.top{
+  padding:12px 15px;border-bottom:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.card>.bd{padding:15px}
+.card>.bd.flush{padding:0}
+
+/* ---------- controls ---------- */
+.btn{
+  padding:7px 13px;border:1px solid var(--rule);background:#fff;font-size:12.5px;font-weight:500;
+  transition:border-color .12s,background .12s;
+}
+.btn:hover:not(:disabled){border-color:var(--ink-3);background:#FAFBFC}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.pri:hover:not(:disabled){background:#2A3B4D;border-color:#2A3B4D}
+.btn.sm{padding:4px 9px;font-size:11.5px}
+select,input[type=text],input[type=date],input[type=number],input[type=password]{
+  padding:6px 9px;border:1px solid var(--rule);background:#fff;font-size:12.5px;
+}
+select:focus,input:focus{outline:2px solid var(--ink);outline-offset:-1px}
+label.f{display:block;margin-bottom:11px}
+label.f>span{
+  display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:4px;font-weight:500;
+}
+label.f>input,label.f>select{width:100%}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+
+/* ---------- table ---------- */
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;text-align:left;padding:8px 10px;
+  border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+td{padding:8px 10px;border-bottom:1px solid var(--rule-2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#F7F9FA}
+.num{text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ---------- mastery strip: the signature ---------- */
+.strip{display:flex;gap:1px;height:26px;align-items:stretch}
+.strip i{flex:1;min-width:2px;background:var(--rule);cursor:pointer;transition:transform .1s}
+.strip i:hover{transform:scaleY(1.28)}
+.strip i.s0{background:var(--m0)}.strip i.s1{background:var(--m1)}
+.strip i.s2{background:var(--m2)}.strip i.s3{background:var(--m3)}
+.strip i.s4{background:var(--m4)}
+.strip i.na{background:#DFE5E9}
+.strip-ax{display:flex;gap:1px;margin-top:3px}
+.strip-ax i{flex:1;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--ink-3);
+  text-align:center;overflow:hidden;white-space:nowrap}
+.sec-ax{display:flex;gap:1px;margin-bottom:3px}
+.sec-ax i{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--ink-3);
+  border-top:1px solid var(--rule);padding-top:2px;text-align:center;overflow:hidden;white-space:nowrap;font-weight:500;
+}
+
+/* ---------- flags ---------- */
+.flag{
+  display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:500;white-space:nowrap;
+}
+.flag::before{content:'';width:7px;height:7px;flex:none}
+.flag.red{color:var(--red)}.flag.red::before{background:var(--red)}
+.flag.amb{color:var(--amber)}.flag.amb::before{background:var(--amber)}
+.flag.grn{color:var(--teal)}.flag.grn::before{background:var(--teal)}
+.flag.gry{color:var(--ink-3)}.flag.gry::before{background:var(--grey)}
+.trend{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
+.trend.up{color:var(--teal)}.trend.dn{color:var(--red)}.trend.fl{color:var(--ink-3)}
+
+/* ---------- heatmap ---------- */
+.heat{border-collapse:separate;border-spacing:1px;font-size:11px}
+.heat th.v{
+  writing-mode:vertical-rl;transform:rotate(180deg);text-align:left;
+  padding:6px 3px;font-size:9.5px;letter-spacing:.04em;height:104px;vertical-align:bottom;
+}
+.heat th.n{text-align:left;padding:5px 9px 5px 0;font-family:'IBM Plex Sans';
+  font-size:12px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400;
+  border:none;white-space:nowrap}
+.heat td{
+  padding:0;border:none;width:30px;height:26px;text-align:center;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;
+  color:#fff;cursor:default;
+}
+.heat td.na{background:#DFE5E9;color:var(--ink-3)}
+.heat td.s0{background:var(--m0)}.heat td.s1{background:var(--m1)}
+.heat td.s2{background:var(--m2)}.heat td.s3{background:var(--m3)}
+.heat td.s4{background:var(--m4)}
+.heat tfoot td{
+  background:transparent;color:var(--ink-2);font-weight:600;
+  border-top:2px solid var(--ink);padding-top:5px;
+}
+.heat tfoot td.lbl{text-align:left;font-family:'IBM Plex Sans';font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-size:9.5px}
+
+/* ---------- entry grid ---------- */
+.egrid{border-collapse:collapse;font-size:12.5px}
+.egrid th{padding:7px 8px;border-bottom:1px solid var(--rule)}
+.egrid th.q{text-align:center;min-width:56px}
+.egrid th.q em{display:block;font-style:normal;font-size:9px;color:var(--ink-3);margin-top:1px;text-transform:none;letter-spacing:0}
+.egrid td{padding:0;border-bottom:1px solid var(--rule-2)}
+.egrid td.nm{padding:0 10px 0 4px;white-space:nowrap;font-size:12.5px}
+.egrid input{
+  width:100%;border:none;padding:8px 4px;text-align:center;background:transparent;
+  font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums;
+  border-left:1px solid var(--rule-2);
+}
+.egrid input:focus{outline:2px solid var(--ink);outline-offset:-2px;background:#FFF9E6}
+.egrid input.bad{background:#FDE8EC;color:var(--red);font-weight:600}
+.egrid input:disabled{background:#F0F3F5;color:var(--ink-3)}
+.egrid td.tot{
+  text-align:right;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-weight:600;
+  border-left:2px solid var(--ink);font-variant-numeric:tabular-nums;
+}
+.egrid tr.abs td.nm{color:var(--ink-3);text-decoration:line-through}
+.abx{width:34px;text-align:center}
+.abx input{width:auto}
+.scroll{overflow-x:auto}
+
+/* ---------- misc ---------- */
+.tag{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;
+  padding:2px 5px;background:var(--paper);border:1px solid var(--rule);color:var(--ink-2);
+  margin:1px 2px 1px 0;
+}
+.tag.ao-A{border-left:2px solid #6B4FA8}
+.tag.ao-B{border-left:2px solid #1A6FA8}
+.warn{
+  background:#FDF6E3;border:1px solid #E8D5A0;border-left:3px solid var(--amber);
+  padding:9px 12px;font-size:12px;margin-bottom:10px;color:#6B5418;
+}
+.err{
+  background:#FDE8EC;border:1px solid #F0BFC9;border-left:3px solid var(--red);
+  padding:9px 12px;font-size:12px;margin-bottom:10px;color:#7A1226;
+}
+.ok{
+  background:#E6F4F1;border:1px solid #A8D5CC;border-left:3px solid var(--teal);
+  padding:9px 12px;font-size:12px;margin-bottom:10px;color:#0A5548;
+}
+.empty{padding:40px 20px;text-align:center;color:var(--ink-3);font-size:13px}
+.empty b{display:block;color:var(--ink);font-size:14px;margin-bottom:5px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:1px;background:var(--rule)}
+.stat{background:#fff;padding:11px 13px}
+.stat b{display:block;font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;letter-spacing:-.5px}
+.stat span{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-top:1px}
+.bar{height:3px;background:var(--rule-2);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink)}
+.lo-txt{font-size:12px;color:var(--ink-2);line-height:1.4}
+.legend{display:flex;gap:13px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);align-items:center}
+.legend i{display:inline-block;width:9px;height:9px;margin-right:4px;vertical-align:-1px}
+dialog{border:1px solid var(--ink);padding:0;max-width:560px;width:92vw;background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(22,32,43,.45)}
+.dlg-h{padding:13px 16px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center}
+.dlg-b{padding:16px;max-height:65vh;overflow-y:auto}
+.dlg-f{padding:12px 16px;border-top:1px solid var(--rule);display:flex;gap:8px;justify-content:flex-end}
+.kbd{font-family:'IBM Plex Mono',monospace;font-size:10px;background:var(--paper);
+  border:1px solid var(--rule);padding:1px 4px}
+.secblk{margin-bottom:15px}
+.sechd{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;padding:0 0 5px;border-bottom:1px solid var(--rule);margin-bottom:0;
+}
+.sechd span{color:var(--ink);margin-right:6px}
+.topic{background:var(--card);border:1px solid var(--rule);border-top:none}
+.topic.off{background:#F8FAFB}
+.thd{
+  display:flex;align-items:center;gap:11px;width:100%;padding:9px 13px;text-align:left;
+}
+.thd:hover{background:#F5F8F9}
+.tw{font-size:9px;color:var(--ink-3);width:9px;flex:none}
+.tn{flex:1;min-width:0;font-size:12.5px}
+.tn b{font-weight:500}
+.tn .qz{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-2);
+  margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc{font-size:10.5px;color:var(--ink-3);width:42px;text-align:right;flex:none}
+.tm{width:34px;flex:none;text-align:right}
+.thd .flag{width:66px;justify-content:flex-end;flex:none}
+.chip{
+  display:inline-block;min-width:26px;padding:2px 5px;font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px;font-weight:600;color:#fff;text-align:center;
+}
+.chip.s0{background:var(--m0)}.chip.s1{background:var(--m1)}.chip.s2{background:var(--m2)}
+.chip.s3{background:var(--m3)}.chip.s4{background:var(--m4)}
+.chip.na{background:#DFE5E9;color:var(--ink-3)}
+.tbd{border-top:1px solid var(--rule);background:#FBFCFD}
+.lotbl{font-size:12px}
+.lotbl th{padding:6px 11px}
+.lotbl td{padding:6px 11px;vertical-align:middle}
+.lotbl tr.unassessed td{opacity:.5}
+.lotbl tr.unassessed:hover td{opacity:.85}
+.spread{display:flex;height:6px;gap:1px}
+.spread i{display:block}
+.sp-r{background:var(--m0)}.sp-a{background:var(--m2)}.sp-g{background:var(--m4)}.sp-y{background:#DFE5E9}
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;
+  background:var(--ink);color:#fff;padding:11px 17px;font-size:12.5px;max-width:88vw;
+  transition:opacity .4s;box-shadow:0 3px 14px rgba(22,32,43,.28);
+}
+details summary::-webkit-details-marker{color:var(--ink-3)}
+@media print{
+  header,nav,.noprint{display:none!important}
+  body{background:#fff}.card{border:1px solid #999;break-inside:avoid}
+  main{max-width:none;padding:0}
+}
+@media (max-width:720px){
+  .brand span{display:none}
+  .brand{padding:11px 12px 11px 0}
+  /* header wraps instead of overflowing off-screen */
+  header{flex-wrap:wrap;padding:0 12px;align-items:center}
+  nav{order:3;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid #2A3B4D}
+  nav button{padding:12px 13px;font-size:13px;min-height:44px}
+  .sync{margin-left:auto}
+  main{padding:14px 12px 80px}
+
+  /* every button is a proper tap target (Apple/Google min is 44px) */
+  .btn{padding:11px 15px;font-size:14px;min-height:44px}
+  .btn.sm{padding:8px 12px;font-size:13px;min-height:38px}
+  .row{gap:8px}
+  /* toolbar buttons go full-width and stack so they can't be mis-tapped */
+  .hd .row.noprint{width:100%}
+  .hd .row.noprint > .btn,
+  .hd .row.noprint > select{flex:1 1 auto;min-width:46%}
+
+  select,input[type=text],input[type=date],input[type=number],input[type=password]{
+    padding:11px 10px;font-size:16px;min-height:44px;   /* 16px stops iOS zoom-on-focus */
+  }
+
+  /* DIALOGS: the main offender. Make them fill the screen with a pinned footer
+     so the action buttons are always reachable, never pushed off the bottom. */
+  dialog{
+    width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;
+    margin:0;border:none;display:flex;flex-direction:column;
+  }
+  dialog[open]{display:flex}
+  .dlg-h{padding:16px;flex:none}
+  .dlg-h h2{font-size:16px}
+  .dlg-b{padding:16px;flex:1 1 auto;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  /* footer sticks to the bottom edge, buttons big and side by side */
+  .dlg-f{
+    padding:12px 16px;flex:none;position:sticky;bottom:0;background:var(--card);
+    box-shadow:0 -2px 10px rgba(22,32,43,.08);
+  }
+  .dlg-f .btn{flex:1 1 auto;justify-content:center;min-height:48px;font-size:15px}
+  .dlg-h .btn.sm{min-height:40px}
+
+  table{font-size:13px}
+  th,td{padding:9px 8px}
+  .legend{font-size:9px;gap:8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+.auth{max-width:440px;margin:26px auto 0}
+.auth h1{margin-bottom:3px}
+.auth .sub{margin-bottom:14px}
+.auth .bd{padding:18px}
+.auth .btn{width:100%;margin-top:4px}
+.auth label.f>input{width:100%}
+.alt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:10px}
+.linkbtn{color:var(--ink-2);font-size:13px;text-decoration:underline;padding:8px 0;min-height:40px}
+.linkbtn:hover{color:var(--ink)}
+.lorow{cursor:pointer}
+.hello{font-size:21px;font-weight:600;letter-spacing:-.4px}
+header .sync #who{max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><div><b>Physics 6091</b><span>MY PROGRESS</span></div></div>
+  <div class="sync">
+    <span id="who"></span>
+    <button id="btnOut" type="button" style="display:none">Sign out</button>
+  </div>
+</header>
+
+<main>
+
+<section class="view on" id="v-load">
+  <div class="card auth"><div class="empty" id="loadMsg"><b>Loading…</b></div></div>
+</section>
+
+<section class="view" id="v-in">
+  <div class="auth">
+    <h1>Sign in</h1>
+    <div class="sub">See your own progress in O Level Physics.</div>
+    <div class="card"><div class="bd">
+      <div id="inMsg"></div>
+      <label class="f"><span>Email</span><input type="text" id="inE" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+      <label class="f"><span>Password</span><input type="password" id="inP" autocomplete="current-password"></label>
+      <button class="btn pri" id="inGo" type="button">Sign in</button>
+      <div class="alt">
+        <button class="linkbtn" type="button" data-go="up">First time? Create an account</button>
+        <button class="linkbtn" type="button" data-go="forgot">Forgot password?</button>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section class="view" id="v-up">
+  <div class="auth">
+    <h1>Create your account</h1>
+    <div class="sub">You need the join code your teacher gave you. It works once.</div>
+    <div class="card"><div class="bd">
+      <div id="upMsg"></div>
+      <label class="f"><span>Join code</span><input type="text" id="upC" placeholder="ABCD-EFGH" autocapitalize="characters" autocomplete="off" spellcheck="false" class="mono"></label>
+      <label class="f"><span>Email</span><input type="text" id="upE" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+      <label class="f"><span>Password (at least 8 characters)</span><input type="password" id="upP" autocomplete="new-password"></label>
+      <label class="f"><span>Password again</span><input type="password" id="upP2" autocomplete="new-password"></label>
+      <button class="btn pri" id="upGo" type="button">Create account</button>
+      <div class="alt"><button class="linkbtn" type="button" data-go="in">Already have an account? Sign in</button></div>
+    </div></div>
+  </div>
+</section>
+
+<section class="view" id="v-forgot">
+  <div class="auth">
+    <h1>Reset your password</h1>
+    <div class="sub">We'll email you a link to set a new one.</div>
+    <div class="card"><div class="bd">
+      <div id="fgMsg"></div>
+      <label class="f"><span>Email</span><input type="text" id="fgE" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+      <button class="btn pri" id="fgGo" type="button">Send reset link</button>
+      <div class="alt"><button class="linkbtn" type="button" data-go="in">Back to sign in</button></div>
+    </div></div>
+  </div>
+</section>
+
+<section class="view" id="v-newpw">
+  <div class="auth">
+    <h1>Choose a new password</h1>
+    <div class="card"><div class="bd">
+      <div id="npMsg"></div>
+      <label class="f"><span>New password (at least 8 characters)</span><input type="password" id="npP" autocomplete="new-password"></label>
+      <label class="f"><span>New password again</span><input type="password" id="npP2" autocomplete="new-password"></label>
+      <button class="btn pri" id="npGo" type="button">Save new password</button>
+    </div></div>
+  </div>
+</section>
+
+<section class="view" id="v-link">
+  <div class="auth">
+    <h1>Enter your join code</h1>
+    <div class="sub">This links your account to your marks. You only do it once.</div>
+    <div class="card"><div class="bd">
+      <div id="lkMsg"></div>
+      <label class="f"><span>Join code</span><input type="text" id="lkC" placeholder="ABCD-EFGH" autocapitalize="characters" autocomplete="off" spellcheck="false" class="mono"></label>
+      <button class="btn pri" id="lkGo" type="button">Link my account</button>
+    </div></div>
+  </div>
+</section>
+
+<section class="view" id="v-teacher">
+  <div class="card auth"><div class="empty"><b>This is a teacher account</b>
+    The portal is for students. Use the teacher app to see everyone's progress.</div></div>
+</section>
+
+<section class="view" id="v-report"><div id="rBody"></div></section>
+
+</main>
+
+<dialog id="dlg">
+  <div class="dlg-h"><h2 id="dlgT">…</h2><button type="button" class="btn sm" id="dlgX">Close</button></div>
+  <div class="dlg-b" id="dlgB"></div>
+</dialog>
+
+<script>
+"use strict";
+const SB_URL = "https://wxtjgopgftvynecedkgs.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4dGpnb3BnZnR2eW5lY2Vka2dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNzQ1OTMsImV4cCI6MjEwNjg1MDU5M30.f5mQYPYczDnOLiIOt8dvL915x1xxpdPWTSA1eUWugWQ";
+const SYL = {"sections":{"I":{"name":"Measurement","topics":["1"]},"II":{"name":"Newtonian Mechanics","topics":["2","3","4","5","6"]},"III":{"name":"Thermal Physics","topics":["7","8","9"]},"IV":{"name":"Waves","topics":["10","11","12"]},"V":{"name":"Electricity and Magnetism","topics":["13","14","15","16","17","18","19"]},"VI":{"name":"Radioactivity","topics":["20"]}},"topics":{"1":{"name":"Physical Quantities, Units and Measurement","section":"I","outcomes":{"1.a":{"text":"Show an understanding that physical quantities typically consist of a numerical magnitude and a unit","ao":"A"},"1.b":{"text":"Recall the base quantities and their units: mass (kg), length (m), time (s), current (A), temperature (K), amount of substance (mol)","ao":"A"},"1.c":{"text":"Use the prefixes and their symbols to indicate decimal sub-multiples and multiples of SI units: nano, micro, milli, centi, deci, kilo, mega, giga, tera","ao":"A"},"1.d":{"text":"Show an understanding of the orders of magnitude of the sizes of common objects ranging from a typical atom to the Earth","ao":"A"},"1.e":{"text":"Select and explain the use of appropriate measuring instruments to measure or determine physical quantities, taking into consideration the range and precision of the instrument","ao":"B"},"1.f":{"text":"State what is meant by scalar and vector quantities and give common examples of each","ao":"A"},"1.g":{"text":"Add two vectors to determine a resultant by a graphical method","ao":"B"}}},"2":{"name":"Kinematics","section":"II","outcomes":{"2.a":{"text":"State what is meant by speed and velocity","ao":"A"},"2.b":{"text":"Calculate average speed = distance travelled / time taken","ao":"B"},"2.c":{"text":"State what is meant by uniform acceleration and calculate the value of acceleration using change in velocity / time taken","ao":"B"},"2.d":{"text":"Interpret given examples of non-uniform acceleration","ao":"B"},"2.e":{"text":"Plot and interpret a displacement-time graph and a velocity-time graph for motion in one dimension","ao":"B"},"2.f":{"text":"Deduce from the shape of a displacement-time graph when a body is: (i) at rest (ii) moving with uniform velocity (iii) moving with non-uniform velocity","ao":"B"},"2.g":{"text":"Deduce from the shape of a velocity-time graph when a body is: (i) at rest (ii) moving with uniform velocity (iii) moving with uniform acceleration (iv) moving with non-uniform acceleration","ao":"B"},"2.h":{"text":"Calculate the area under a velocity-time graph to determine the displacement for motion with uniform velocity or uniform acceleration","ao":"B"},"2.i":{"text":"State that the acceleration of free fall for a body near to the Earth is constant and is approximately 10 m/s\u00b2","ao":"A"}}},"3":{"name":"Dynamics","section":"II","outcomes":{"3.a":{"text":"Identify and distinguish between contact forces (e.g. friction, air resistance, tension, normal force) and non-contact forces (e.g. gravitational, electrostatic, magnetic)","ao":"A"},"3.b":{"text":"State that mass is a measure of the amount of matter in a body","ao":"A"},"3.c":{"text":"State that a gravitational field is a region in which a mass experiences a force due to gravitational attraction","ao":"A"},"3.d":{"text":"Define gravitational field strength, g, as gravitational force per unit mass placed at that point","ao":"A"},"3.e":{"text":"Recall and apply the relationship weight = mass \u00d7 gravitational field strength to new situations or to solve related problems","ao":"B"},"3.f":{"text":"Distinguish between mass and weight","ao":"A"},"3.g":{"text":"Apply Newton's Laws to: (i) describe the effect of balanced and unbalanced forces on a body (ii) describe the ways in which a force may change the motion of a body (iii) identify action-reaction pairs acting on two interacting bodies. (Stating of Newton's Laws is not required.)","ao":"B"},"3.h":{"text":"Identify forces acting on a body and draw free body diagram(s) representing the forces acting on the body (for cases involving forces acting in at most two dimensions)","ao":"B"},"3.i":{"text":"Solve problems for a static point mass under the action of three forces for two-dimensional cases by a graphical method","ao":"B"},"3.j":{"text":"Recall and apply the relationship resultant force = mass \u00d7 acceleration to new situations or to solve related problems","ao":"B"},"3.k":{"text":"Show an understanding that mass is the property that resists change in motion of the body (inertia)","ao":"A"},"3.l":{"text":"Explain the effects of friction on the motion of a body","ao":"A"},"3.m":{"text":"Describe the motion of bodies with constant mass falling in uniform gravitational field with or without air resistance, including reference to terminal velocity","ao":"A"}}},"4":{"name":"Turning Effects of Forces","section":"II","outcomes":{"4.a":{"text":"Describe the moment of a force about a pivot in terms of its turning effect and relate this to everyday examples","ao":"A"},"4.b":{"text":"Recall and apply the relationship moment of a force (or torque) = force \u00d7 perpendicular distance from the pivot to new situations or to solve related problems","ao":"B"},"4.c":{"text":"State the principle of moments for a body in equilibrium","ao":"A"},"4.d":{"text":"Apply the principle of moments to new situations or to solve related problems","ao":"B"},"4.e":{"text":"Show an understanding that the weight of a body may be taken as acting at a single point known as its centre of gravity","ao":"A"},"4.f":{"text":"Describe qualitatively the effect of the position of the centre of gravity on the stability of objects","ao":"A"}}},"5":{"name":"Pressure","section":"II","outcomes":{"5.a":{"text":"Define pressure in terms of force and area","ao":"A"},"5.b":{"text":"Recall and apply the relationship pressure = force / area to new situations or to solve related problems","ao":"B"},"5.c":{"text":"Describe and explain the transmission of pressure in hydraulic systems with particular reference to the hydraulic press","ao":"A"},"5.d":{"text":"Recall and apply the relationship density = mass / volume to new situations or to solve related problems","ao":"B"},"5.e":{"text":"Recall and apply the relationship pressure due to a liquid column = height of column \u00d7 density of the liquid \u00d7 gravitational field strength to new situations or to solve related problems","ao":"B"},"5.f":{"text":"Describe how the height of a liquid column may be used to measure the atmospheric pressure","ao":"A"},"5.g":{"text":"Describe the use of a manometer in the measurement of pressure difference","ao":"A"}}},"6":{"name":"Energy","section":"II","outcomes":{"6.a":{"text":"Show an understanding that there are energy stores (e.g. kinetic, potential [gravitational, chemical, elastic], nuclear, internal) and that energy can be transferred from one store to another: (i) mechanically (ii) electrically (iii) by heating (iv) by propagation of waves","ao":"A"},"6.b":{"text":"Recall and apply the relationships for kinetic energy (Ek = \u00bdmv\u00b2) and gravitational potential energy near the Earth's surface (Ep = mgh) to new situations or to solve related problems","ao":"B"},"6.c":{"text":"State the principle of the conservation of energy and apply the principle to new situations or to solve related problems","ao":"B"},"6.d":{"text":"Recall and apply the relationship work done = force \u00d7 distance moved in the direction of the force to new situations or to solve related problems","ao":"B"},"6.e":{"text":"Recall and apply the relationship power = energy transfer / time taken to new situations or to solve related problems","ao":"B"},"6.f":{"text":"Calculate the efficiency of an energy transfer using efficiency = useful energy output / total energy input","ao":"B"},"6.g":{"text":"Discuss the use of non-renewable energy resources (fossil fuel, nuclear fuel) and renewable energy resources (biofuel, wind, tides, hydropower, geothermal, solar) to generate electricity in terms of efficiency of energy transfer, cost, reliability and environmental impact","ao":"A"}}},"7":{"name":"Kinetic Particle Model of Matter","section":"III","outcomes":{"7.a":{"text":"Compare the physical properties of solids, liquids and gases","ao":"A"},"7.b":{"text":"Use the kinetic particle model to describe the different states of matter, relating their physical properties to the arrangement and motion of the particles and the forces and distances between particles","ao":"A"},"7.c":{"text":"Infer from a Brownian motion experiment the evidence for the random movement of molecules in a liquid or gas","ao":"B"},"7.d":{"text":"Relate the rise in temperature of a body to the increase in average kinetic energy of all the particles in the body","ao":"A"},"7.e":{"text":"Explain the pressure of a gas in terms of the motion of its particles","ao":"A"}}},"8":{"name":"Thermal Processes","section":"III","outcomes":{"8.a":{"text":"Show an understanding that energy is transferred (by heating) from a region of higher temperature to a region of lower temperature until thermal equilibrium is achieved between the two regions","ao":"A"},"8.b":{"text":"Describe, in microscopic terms, how conduction occurs in solids (via vibration of atoms/molecules and movement of electrons)","ao":"A"},"8.c":{"text":"Describe, in terms of density changes, how convection occurs in fluids","ao":"A"},"8.d":{"text":"Explain that energy transfer by electromagnetic radiation does not require a material medium and that the rate of energy transfer to/from a body is affected by its: (i) surface colour and texture (ii) surface temperature (iii) surface area","ao":"A"},"8.e":{"text":"Apply the concepts of conduction, convection and radiation in everyday examples","ao":"B"}}},"9":{"name":"Thermal Properties of Matter","section":"III","outcomes":{"9.a":{"text":"Describe internal energy as an energy store made up of the total kinetic energy associated with the random motion of the particles and the total potential energy between the particles in the system","ao":"A"},"9.b":{"text":"Define heat capacity and specific heat capacity","ao":"A"},"9.c":{"text":"Recall and apply the relationship energy transfer (by heating) = mass \u00d7 specific heat capacity \u00d7 change in temperature to new situations or to solve related problems","ao":"B"},"9.d":{"text":"Describe melting/solidification and boiling/condensation as processes of energy transfer without a change in temperature","ao":"A"},"9.e":{"text":"Explain the difference between boiling and evaporation","ao":"A"},"9.f":{"text":"Define latent heat and specific latent heat","ao":"A"},"9.g":{"text":"Recall and apply the relationship energy transfer (by heating for a change of state) = mass \u00d7 specific latent heat to new situations or to solve related problems","ao":"B"},"9.h":{"text":"Explain latent heat in terms of behaviour of particles in a body","ao":"A"},"9.i":{"text":"Sketch and interpret a cooling curve","ao":"B"}}},"10":{"name":"General Properties of Waves","section":"IV","outcomes":{"10.a":{"text":"Describe what is meant by wave motion as illustrated by vibrations in ropes and springs and by waves in a ripple tank (including use of the term wavefront)","ao":"A"},"10.b":{"text":"Show an understanding that waves transfer energy without transferring matter","ao":"A"},"10.c":{"text":"Define and use the terms speed, frequency, wavelength, period and amplitude, including graphical representation","ao":"A"},"10.d":{"text":"Recall and apply the relationship speed of wave = frequency \u00d7 wavelength to new situations or to solve related problems","ao":"B"},"10.e":{"text":"Compare transverse and longitudinal waves and give suitable examples of each","ao":"A"},"10.f":{"text":"Show an understanding that sound can be produced by vibrating sources and that a medium is required for the transmission of sound","ao":"A"},"10.g":{"text":"Describe the longitudinal nature of sound waves in terms of the processes of compression and rarefaction","ao":"A"},"10.h":{"text":"Relate loudness of a sound wave to its amplitude and pitch to its frequency","ao":"A"},"10.i":{"text":"Describe how the reflection of sound may produce an echo, and how this may be used for measuring distances","ao":"A"},"10.j":{"text":"Describe and explain how ultrasound is used, e.g. including sonar and medical scanning of soft tissue","ao":"A"}}},"11":{"name":"Electromagnetic Spectrum","section":"IV","outcomes":{"11.a":{"text":"State that all electromagnetic waves are transverse waves that travel with the same speed in vacuum","ao":"A"},"11.b":{"text":"Describe the main regions of the electromagnetic spectrum in order of wavelength and frequency","ao":"A"},"11.c":{"text":"State examples of typical uses of the regions of the electromagnetic spectrum: (i) radio waves (ii) microwaves (iii) infrared (iv) visible light (v) ultraviolet (vi) X-rays (vii) gamma rays","ao":"A"},"11.d":{"text":"Describe how over-exposure to electromagnetic waves can have hazardous effects (e.g. heating and ionising effects of radiation) on living cells and tissue","ao":"A"}}},"12":{"name":"Light","section":"IV","outcomes":{"12.a":{"text":"Recall and use the terms normal, angle of incidence and angle of reflection to describe the reflection of light","ao":"A"},"12.b":{"text":"State that, for reflection, the angle of incidence is equal to the angle of reflection, and use this principle in constructions, measurements and calculations","ao":"B"},"12.c":{"text":"Recall and use the terms normal, angle of incidence and angle of refraction to describe the refraction of light","ao":"A"},"12.d":{"text":"Recall and apply the relationship sin i / sin r = constant to new situations or to solve related problems","ao":"B"},"12.e":{"text":"Define refractive index of a medium in terms of the ratio of speed of light in vacuum and in the medium","ao":"A"},"12.f":{"text":"Explain the terms critical angle and total internal reflection","ao":"A"},"12.g":{"text":"Apply total internal reflection to the use of optical fibres in telecommunication and medicine, stating the advantages of such use","ao":"B"},"12.h":{"text":"Describe the action of a thin converging lens on a beam of light","ao":"A"},"12.i":{"text":"Define the focal length for a converging lens","ao":"A"},"12.j":{"text":"Draw ray diagrams to illustrate the formation of real and virtual images of an object by a thin converging lens","ao":"B"},"12.k":{"text":"Describe the characteristics of images (e.g. real/virtual, magnified/diminished, upright/inverted) formed by a thin converging lens","ao":"A"}}},"13":{"name":"Static Electricity","section":"V","outcomes":{"13.a":{"text":"State that there are positive and negative charges and that charge is measured in coulombs","ao":"A"},"13.b":{"text":"State that unlike charges attract and like charges repel","ao":"A"},"13.c":{"text":"Describe an electric field as a region in which an electric charge experiences a force","ao":"A"},"13.d":{"text":"Draw the electric field of an isolated point charge and recall that the direction of the field lines gives the direction of the force acting on a positive test charge","ao":"A"},"13.e":{"text":"Draw the electric field pattern between two isolated point charges","ao":"B"},"13.f":{"text":"Show an understanding that electrostatic charging by rubbing involves a transfer of electrons","ao":"A"},"13.g":{"text":"Describe experiments to show electrostatic charging by induction","ao":"A"},"13.h":{"text":"Describe examples where electrostatic charging may be a potential hazard","ao":"A"},"13.i":{"text":"Describe the use of electrostatic charging in an electrostatic precipitator and apply the use of electrostatic charging to new situations","ao":"B"}}},"14":{"name":"Current of Electricity","section":"V","outcomes":{"14.a":{"text":"State that current is the rate of flow of charge and that it is measured in amperes","ao":"A"},"14.b":{"text":"Distinguish between conventional current and electron flow","ao":"A"},"14.c":{"text":"Recall and apply the relationship charge = current \u00d7 time to new situations or to solve related problems","ao":"B"},"14.d":{"text":"State that the electromotive force (e.m.f.) of a source is the work done per unit charge by the source in driving charges around a complete circuit, and that it is measured in volts","ao":"A"},"14.e":{"text":"Calculate the total e.m.f. where several sources are arranged in series","ao":"B"},"14.f":{"text":"State that the potential difference (p.d.) across a component in a circuit is the work done per unit charge in driving charges through the component, and that it is measured in volts","ao":"A"},"14.g":{"text":"State that resistance = p.d. / current","ao":"A"},"14.h":{"text":"Apply the relationship R = V / I to new situations or to solve related problems","ao":"B"},"14.i":{"text":"Recall and apply the relationship of the proportionality between resistance and the length and cross-sectional area of a wire to new situations or to solve related problems","ao":"B"},"14.j":{"text":"Describe the effect of temperature increase on the resistance of a metallic conductor","ao":"A"},"14.k":{"text":"Sketch and interpret the I-V characteristic graphs for a metallic conductor at constant temperature (ohmic conductor), for a filament lamp and for a semiconductor diode","ao":"B"}}},"15":{"name":"D.C. Circuits","section":"V","outcomes":{"15.a":{"text":"Draw circuit diagrams with power sources, switches, lamps, resistors (fixed and variable), variable potential divider (potentiometer), fuses, ammeters and voltmeters, bells, light-dependent resistors, thermistors and light-emitting diodes","ao":"A"},"15.b":{"text":"State that the current at every point in a series circuit is the same, and apply the principle to new situations or to solve related problems","ao":"B"},"15.c":{"text":"State that the sum of the potential differences in a series circuit is equal to the potential difference across the whole circuit, and apply the principle to new situations or to solve related problems","ao":"B"},"15.d":{"text":"State that the sum of the currents in the separate branches of a parallel circuit is equal to the current from the source, and apply the principle to new situations or to solve related problems","ao":"B"},"15.e":{"text":"State that the potential difference across the separate branches of a parallel circuit is the same, and apply the principle to new situations or to solve related problems","ao":"B"},"15.f":{"text":"Recall and apply the formulae for the effective resistance of a number of resistors in series and in parallel to new situations or to solve related problems","ao":"B"},"15.g":{"text":"Recall and apply the relevant relationships, including R = V / I and those for current, potential differences and resistors in series and in parallel circuits, in calculations involving a whole circuit","ao":"B"},"15.h":{"text":"Describe the action of a variable potential divider (potentiometer)","ao":"A"},"15.i":{"text":"Describe the action of negative temperature coefficient (NTC) thermistors and light-dependent resistors and explain their use as input transducers in potential dividers","ao":"A"},"15.j":{"text":"Solve simple circuit problems involving NTC thermistors and light-dependent resistors","ao":"B"}}},"16":{"name":"Practical Electricity","section":"V","outcomes":{"16.a":{"text":"Describe the use of the heating effect of electricity in appliances such as electric kettles, ovens and heaters","ao":"A"},"16.b":{"text":"Recall and apply the relationships P = VI and E = VIt to new situations or to solve related problems","ao":"B"},"16.c":{"text":"Calculate the cost of using electrical appliances where the energy unit is the kW h","ao":"B"},"16.d":{"text":"State the hazards of using electricity in the following situations: (i) damaged insulation (ii) overheating of cables (iii) damp conditions","ao":"A"},"16.e":{"text":"Explain the use of fuses and circuit breakers in electrical circuits and of fuse ratings","ao":"A"},"16.f":{"text":"Explain the need for earthing metal casings and for double insulation","ao":"A"},"16.g":{"text":"State the meaning of the terms live, neutral and earth","ao":"A"},"16.h":{"text":"Describe the wiring in a mains plug","ao":"A"},"16.i":{"text":"Explain why switches, fuses, and circuit breakers are fitted to the live wire","ao":"A"}}},"17":{"name":"Magnetism","section":"V","outcomes":{"17.a":{"text":"State the properties of magnets","ao":"A"},"17.b":{"text":"Describe induced magnetism caused by placing magnetic material close to a strong magnet or within a current-carrying solenoid","ao":"A"},"17.c":{"text":"Distinguish between temporary magnets (e.g. iron) and permanent magnets (e.g. steel) in terms of their properties and uses","ao":"A"},"17.d":{"text":"Describe how a bar magnet (e.g. a compass) can be used to determine the direction of a magnetic field","ao":"A"},"17.e":{"text":"Draw the magnetic field pattern around a bar magnet and between the poles of two bar magnets","ao":"B"}}},"18":{"name":"Electromagnetism","section":"V","outcomes":{"18.a":{"text":"Draw the pattern of the magnetic field due to currents in straight wires and in solenoids and state the effect on the magnetic field of changing the magnitude and/or direction of the current","ao":"B"},"18.b":{"text":"Describe the application of the magnetic effect of a current in electromagnets (e.g. circuit breakers)","ao":"A"},"18.c":{"text":"Describe experiments to show the force on a current-carrying conductor, and on a beam of charged particles, in a magnetic field, including the effect of reversing (i) the current (ii) the direction of the field","ao":"A"},"18.d":{"text":"Deduce the relative directions of force, field and current when any two of these quantities are at right angles to each other, using Fleming's left-hand rule","ao":"B"},"18.e":{"text":"Explain how a current-carrying coil in a magnetic field (e.g. in a motor) experiences a turning effect and that the effect is increased by increasing (i) the number of turns on the coil (ii) the current","ao":"A"},"18.f":{"text":"Describe the action of a split-ring commutator in a two-pole, single-coil motor and the effect of winding the coil on to a soft-iron cylinder","ao":"A"}}},"19":{"name":"Electromagnetic Induction","section":"V","outcomes":{"19.a":{"text":"Deduce from Faraday's experiments on electromagnetic induction or other appropriate experiments: (i) that a changing magnetic field can induce an e.m.f. in a circuit (ii) that the direction of the induced e.m.f. opposes the change producing it (iii) the factors affecting the magnitude of the induced e.m.f.","ao":"B"},"19.b":{"text":"Describe a simple a.c. generator (rotating coil or rotating magnet) and the use of slip rings (where needed)","ao":"A"},"19.c":{"text":"Sketch a graph of voltage output against time for a simple a.c. generator","ao":"B"},"19.d":{"text":"Describe the structure and principle of operation of a simple iron-cored transformer as used for voltage transformations","ao":"A"},"19.e":{"text":"Recall and apply the equations VP / VS = NP / NS and VPIP = VSIS to new situations or to solve related problems (for an ideal transformer)","ao":"B"},"19.f":{"text":"Describe the energy loss in cables and deduce the advantages of high voltage transmission","ao":"B"}}},"20":{"name":"Radioactivity","section":"VI","outcomes":{"20.a":{"text":"Describe the composition of an atom in terms of a positive nucleus (with protons and neutrons) and negatively charged electrons","ao":"A"},"20.b":{"text":"Use the terms proton (atomic) number Z, nucleon (mass) number A and isotope","ao":"A"},"20.c":{"text":"Use and interpret the term nuclide and use the nuclide notation \u1d2c\ud835\uddd3X","ao":"B"},"20.d":{"text":"Show an understanding that nuclear decay is a random and spontaneous process whereby an unstable nucleus loses energy by emitting radiation","ao":"A"},"20.e":{"text":"Show an understanding of the nature of alpha (\u03b1), beta (\u03b2), and gamma (\u03b3) radiation, including ionising effect and penetrating power. (\u03b2-particles are assumed to be \u03b2\u2013 particles only.)","ao":"A"},"20.f":{"text":"Use equations involving nuclide notation to represent changes in the composition of the nucleus when radioactive emissions occur","ao":"B"},"20.g":{"text":"Show an understanding of background radiation","ao":"A"},"20.h":{"text":"Use the term half-life in simple calculations, which might involve information in tables or decay curves","ao":"B"},"20.i":{"text":"Discuss the applications (e.g. medical and industrial uses) and hazards of radioactivity based on: (i) half-life of radioactive materials (ii) penetrating abilities and ionising effects of radioactive emissions","ao":"B"},"20.j":{"text":"State the meaning of nuclear fusion and nuclear fission and relate these nuclear processes with the release of energy from nuclear fuels. (Recall of energy-mass equivalence and details of nuclear power plant technologies are not required.)","ao":"A"}}}}};
+/* ---------------- ordered LO list (section → topic → letter) ------------- */
+const SECS = Object.keys(SYL.sections);
+const TOPICS = [];
+SECS.forEach(s => SYL.sections[s].topics.forEach(t => TOPICS.push(t)));
+const LOS = [];              // ordered array of LO codes
+const LO_TOPIC = {};         // code -> topic num
+TOPICS.forEach(t => Object.keys(SYL.topics[t].outcomes).forEach(c => {
+  LOS.push(c); LO_TOPIC[c] = t;
+}));
+const lo = c => SYL.topics[LO_TOPIC[c]].outcomes[c];
+
+/* topics a quiz actually covers, derived from its question LO tags.
+   A quiz can span several — the single quiz.topic is just a "home" label
+   for older quizzes and is used only as a fallback. */
+function quizTopics(q){
+  const set = new Set();
+  Object.values(q.questions||{}).forEach(def=>
+    (def.los||[]).forEach(c=>{ if(LO_TOPIC[c]) set.add(LO_TOPIC[c]); }));
+  if(!set.size && q.topic) set.add(q.topic);
+  return [...set].sort((a,b)=>Number(a)-Number(b));
+}
+function quizTopicLabel(q){
+  const ts = quizTopics(q);
+  if(ts.length===1) return ts[0]+'. '+tName(ts[0]);
+  if(ts.length===0) return '—';
+  return ts.join(', ')+' · '+ts.map(tName).join(' / ');
+}
+
+const tName = t => SYL.topics[t].name;
+
+
+let DB = { students:{}, quizzes:{}, results:{} };
+/* ================= MASTERY ENGINE ======================================== */
+/* For each (student, LO): every question tagged with that LO contributes a
+   ratio marks/max. Recent attempts weigh more (decay .7 per step back).
+   Returns {m: 0..1 mastery, n: attempts, trend: +1/0/-1, evidence:[...]}   */
+const DECAY = 0.7;
+
+function mastery(sid){
+  const acc = {};   // lo -> [{r, date, quiz, q, got, max}]
+  for(const [qid,q] of Object.entries(DB.quizzes)){
+    const res = DB.results[qid];
+    if(!res || !res.scores || !res.scores[sid]) continue;
+    if((res.absent||[]).includes(sid)) continue;
+    const marks = res.scores[sid];
+    for(const [qn,def] of Object.entries(q.questions||{})){
+      const got = marks[qn];
+      if(got===undefined || got===null || got==='') continue;
+      const r = def.max>0 ? Math.max(0,Math.min(1, got/def.max)) : 0;
+      (def.los||[]).forEach(c=>{
+        if(!LO_TOPIC[c]) return;
+        (acc[c] = acc[c]||[]).push({r, date:q.date||'', quiz:qid, q:qn, got, max:def.max});
+      });
+    }
+  }
+  const out = {};
+  for(const [c,list] of Object.entries(acc)){
+    list.sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+    // weighted mean, most recent heaviest
+    let num=0, den=0;
+    for(let i=list.length-1, k=0; i>=0; i--, k++){
+      const w = Math.pow(DECAY,k);
+      num += list[i].r * w; den += w;
+    }
+    const m = den ? num/den : 0;
+    // trend: mean of last 2 vs mean of everything before
+    let trend = 0;
+    if(list.length>=3){
+      const cut = list.length-2;
+      const recent = list.slice(cut).reduce((a,b)=>a+b.r,0)/2;
+      const prior  = list.slice(0,cut).reduce((a,b)=>a+b.r,0)/cut;
+      if(recent-prior >  0.12) trend = 1;
+      if(recent-prior < -0.12) trend = -1;
+    }
+    out[c] = {m, n:list.length, trend, evidence:list};
+  }
+  return out;
+}
+
+/* flag bands — grey (insufficient data) is NOT a weakness */
+function flag(d){
+  if(!d || d.n===0) return {k:'gry', t:'No data'};
+  if(d.n===1)       return {k:'gry', t:'1 attempt'};
+  if(d.m>=0.75)     return {k:'grn', t:'Strength'};
+  if(d.m>=0.50)     return {k:'amb', t:'Developing'};
+  return {k:'red', t:'Needs work'};
+}
+const band = d => (!d||d.n===0) ? 'na' : 's'+Math.min(4, Math.floor(d.m*5));
+const arrow = t => t>0 ? '<span class="trend up">↑</span>'
+                : t<0 ? '<span class="trend dn">↓</span>'
+                : '<span class="trend fl">→</span>';
+const pc = x => Math.round(x*100)+'%';
+
+/* topic-level roll-up = mean of LO mastery within the topic (assessed only) */
+function topicScore(mast, t){
+  const cs = Object.keys(SYL.topics[t].outcomes).filter(c=>mast[c]);
+  if(!cs.length) return null;
+  const m = cs.reduce((a,c)=>a+mast[c].m,0)/cs.length;
+  const n = cs.reduce((a,c)=>a+mast[c].n,0);
+  return {m, n, cov:cs.length, of:Object.keys(SYL.topics[t].outcomes).length};
+}
+/* overall = mean across every assessed LO */
+function overall(mast){
+  const cs = Object.keys(mast);
+  if(!cs.length) return null;
+  return {m: cs.reduce((a,c)=>a+mast[c].m,0)/cs.length, cov:cs.length, of:LOS.length};
+}
+/* AO split — recall vs application */
+function aoSplit(mast){
+  const g = {A:[],B:[]};
+  Object.entries(mast).forEach(([c,d])=>{ if(d.n>=2) g[lo(c).ao].push(d.m); });
+  const mean = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  return {A:mean(g.A), B:mean(g.B), nA:g.A.length, nB:g.B.length};
+}
+
+
+
+/* ================= PORTAL ================================================ */
+const $id = id => document.getElementById(id);
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+const HASH = location.hash || '';
+const HASH_RECOVERY = /type=recovery/.test(HASH);
+const HASH_ERROR = (HASH.match(/error_description=([^&]+)/)||[])[1];
+
+const sb = (window.supabase && /^https:\/\//.test(SB_URL) && SB_KEY && SB_KEY.indexOf('__')!==0)
+  ? window.supabase.createClient(SB_URL, SB_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:'p6091-portal' } })
+  : null;
+let ME = null, RECOVERY = HASH_RECOVERY;
+
+function show(v){
+  document.querySelectorAll('.view').forEach(s => s.classList.toggle('on', s.id==='v-'+v));
+  window.scrollTo(0,0);
+}
+function note(id, text, kind){ $id(id).innerHTML = text ? `<div class="${kind||'err'}">${esc(text)}</div>` : ''; }
+function busy(btn, on, label){ btn.disabled = on; btn.textContent = label; }
+function fatal(text){
+  $id('loadMsg').innerHTML = `<b>Something went wrong</b>${esc(text)}
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn pri" type="button" onclick="location.reload()">Try again</button></div>`;
+  show('load');
+}
+function friendly(m){
+  m = String(m||'');
+  if(/invalid login credentials/i.test(m)) return 'That email and password don\'t match. Check them, or use "Forgot password?".';
+  if(/already registered|already been registered/i.test(m)) return 'An account with this email already exists. Sign in instead.';
+  if(/email not confirmed/i.test(m)) return 'Please confirm your email first, using the link we sent you.';
+  if(/rate limit|too many/i.test(m)) return 'Too many attempts. Wait a few minutes and try again.';
+  if(/password should be|at least/i.test(m)) return 'Choose a longer password (at least 8 characters).';
+  if(/failed to fetch|network/i.test(m)) return 'Can\'t reach the server. Check your internet connection.';
+  return m;
+}
+const emailOk = e => /^\S+@\S+\.\S+$/.test(e);
+
+async function boot(){
+  if(!sb){
+    $id('loadMsg').innerHTML = window.supabase
+      ? '<b>This portal isn\'t set up yet</b>Ask your teacher for the correct link.'
+      : '<b>Can\'t load</b>Check your internet connection, then reload the page.';
+    return;
+  }
+  sb.auth.onAuthStateChange(ev => { if(ev==='PASSWORD_RECOVERY'){ RECOVERY = true; show('newpw'); } });
+  const { data } = await sb.auth.getSession();
+  if(RECOVERY){ show('newpw'); return; }
+  if(data && data.session){ await enter(); return; }
+  show('in');
+  if(HASH_ERROR) note('inMsg', decodeURIComponent(HASH_ERROR.replace(/\+/g,' ')));
+}
+
+async function enter(){
+  show('load');
+  $id('loadMsg').innerHTML = '<b>Loading your progress…</b>';
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!user){ show('in'); return; }
+  $id('who').textContent = user.email || '';
+  $id('btnOut').style.display = '';
+  const p = await sb.from('profiles').select('role, student_id').eq('id', user.id).maybeSingle();
+  if(p.error){ fatal('Could not load your account: '+friendly(p.error.message)); return; }
+  if(p.data && p.data.role==='teacher'){ show('teacher'); return; }
+  if(!p.data || !p.data.student_id){ show('link'); return; }
+  ME = p.data.student_id;
+  await loadMine();
+}
+
+async function loadMine(){
+  const [me, qz, rs] = await Promise.all([
+    sb.from('students').select('*').eq('student_code', ME).maybeSingle(),
+    sb.from('quizzes').select('*'),
+    sb.from('results').select('*')
+  ]);
+  const err = me.error || qz.error || rs.error;
+  if(err){ fatal('Could not load your marks: '+friendly(err.message)); return; }
+  if(!me.data){ fatal('Your record could not be found. Ask your teacher to check your account.'); return; }
+  DB = { students:{}, quizzes:{}, results:{} };
+  DB.students[ME] = { name:me.data.name, class:me.data.class, active:me.data.active };
+  (qz.data||[]).forEach(q => DB.quizzes[q.id] =
+    { id:q.id, title:q.title, class:q.class, topic:q.topic, date:q.date, total:Number(q.total)||0, questions:q.questions||{} });
+  (rs.data||[]).forEach(r => {
+    if(r.student_code !== ME) return;            // belt and braces; RLS already filters
+    const R = DB.results[r.quiz_id] = DB.results[r.quiz_id] || { quiz:r.quiz_id, scores:{}, absent:[] };
+    if(r.absent) R.absent.push(ME); else R.scores[ME] = r.marks || {};
+  });
+  renderReport();
+  show('report');
+}
+
+/* ---- report -------------------------------------------------------------- */
+function aoAdvice(ao){
+  const d = ao.A - ao.B;
+  if(d > 0.15)  return 'You know the facts well, but applying them to new problems is harder. Practise unfamiliar exam-style questions rather than re-reading your notes.';
+  if(d < -0.15) return 'You can apply the physics, but some definitions and laws are shaky. Short, regular recall practice will help.';
+  return 'Your recall and your problem-solving are evenly matched.';
+}
+function secAxis(){
+  return SECS.map(s=>{
+    const n = SYL.sections[s].topics.reduce((a,t)=>a+Object.keys(SYL.topics[t].outcomes).length,0);
+    return `<i style="flex:${n}" title="${esc(SYL.sections[s].name)}">${esc(SYL.sections[s].name)}</i>`;
+  }).join('');
+}
+function topicAxis(){
+  return TOPICS.map(t=>`<i style="flex:${Object.keys(SYL.topics[t].outcomes).length}" title="${esc(tName(t))}">${t}</i>`).join('');
+}
+function quizScore(qid){
+  const q = DB.quizzes[qid], r = DB.results[qid];
+  if(!r) return null;
+  if((r.absent||[]).includes(ME)) return 'absent';
+  const m = r.scores[ME]; if(!m) return null;
+  const got = Object.keys(q.questions||{}).reduce((a,k)=>a+(Number(m[k])||0),0);
+  return { got, total:q.total };
+}
+
+function renderReport(){
+  const st = DB.students[ME];
+  const mast = mastery(ME), ov = overall(mast), ao = aoSplit(mast);
+  const first = esc(String(st.name||'').split(' ')[0]);
+  const quizzes = Object.entries(DB.quizzes).sort((a,b)=>(b[1].date||'').localeCompare(a[1].date||''));
+
+  const quizCard = `<div class="card"><div class="top"><div><h2>Your quizzes</h2></div></div>
+    <div class="bd flush">${quizzes.length ? `<table><thead><tr><th>Quiz</th><th class="num">Score</th></tr></thead><tbody>
+      ${quizzes.map(([id,q])=>{
+        const s = quizScore(id);
+        return `<tr><td>${esc(q.title||id)}<br><span class="mono" style="font-size:10px;color:var(--ink-3)">${esc(q.date||'')}</span></td>
+          <td class="num">${s==='absent' ? '<span style="color:var(--ink-3)">absent</span>' : s ? s.got+'/'+s.total+' <span style="color:var(--ink-3)">('+Math.round(s.got/(s.total||1)*100)+'%)</span>' : '<span style="color:var(--ink-3)">not marked</span>'}</td></tr>`;
+      }).join('')}</tbody></table>` : '<div class="empty">No quizzes yet.</div>'}</div></div>`;
+
+  if(!ov){
+    $id('rBody').innerHTML = `<div class="card"><div class="bd">
+      <div class="hello">Hi ${first}</div><div class="eyebrow" style="margin-top:3px">${esc(st.class)}</div>
+      <div class="empty" style="padding:24px 0 6px"><b>No marks yet</b>Your report appears here after your first quiz is marked.</div>
+    </div></div>` + quizCard;
+    return;
+  }
+
+  const B = { red:[], amb:[], grn:[], gry:[] };
+  Object.entries(mast).forEach(([c,d]) => B[flag(d).k].push([c,d]));
+  B.red.sort((a,b)=>a[1].m-b[1].m);
+  B.grn.sort((a,b)=>b[1].m-a[1].m);
+  B.amb.sort((a,b)=>a[1].trend-b[1].trend || a[1].m-b[1].m);
+  const unseen = LOS.length - Object.keys(mast).length;
+
+  const row = ([c,d]) => `<tr class="lorow" data-lo="${c}">
+    <td><span class="tag ao-${lo(c).ao}">${c}</span></td>
+    <td class="lo-txt">${esc(lo(c).text.slice(0,100))}${lo(c).text.length>100?'…':''}</td>
+    <td class="num">${pc(d.m)}</td><td class="num">${arrow(d.trend)}</td></tr>`;
+  const list = (title, sub, items) => items.length ? `<div class="card"><div class="top">
+    <div><h2>${title}</h2><div class="eyebrow">${sub}</div></div></div>
+    <div class="bd flush scroll"><table><thead><tr><th>Outcome</th><th>What it means</th>
+      <th class="num">Score</th><th class="num">Trend</th></tr></thead><tbody>${items.map(row).join('')}</tbody></table></div></div>` : '';
+
+  $id('rBody').innerHTML = `
+  <div class="card">
+    <div class="bd">
+      <div class="hello">Hi ${first}</div>
+      <div class="eyebrow" style="margin-top:3px">${esc(st.class)} · based on ${ov.cov} of ${ov.of} learning outcomes so far</div>
+    </div>
+    <div class="bd" style="border-top:1px solid var(--rule)">
+      <div class="sec-ax">${secAxis()}</div>
+      <div class="strip">${LOS.map(c=>{ const d = mast[c];
+        return `<i class="${band(d)}" data-lo="${c}" title="${c} — ${d ? pc(d.m) : 'not tested yet'}"></i>`; }).join('')}</div>
+      <div class="strip-ax">${topicAxis()}</div>
+      <div class="sub" style="margin-top:8px;font-size:12px">Each bar is one learning outcome in the syllabus. Tap one to see the details. Grey means not tested yet.</div>
+    </div>
+    <div class="bd" style="border-top:1px solid var(--rule)">
+      <div class="stats">
+        <div class="stat"><b>${pc(ov.m)}</b><span>Overall</span><div class="bar"><i style="width:${ov.m*100}%"></i></div></div>
+        <div class="stat"><b style="color:var(--teal)">${B.grn.length}</b><span>Strengths</span></div>
+        <div class="stat"><b style="color:var(--amber)">${B.amb.length}</b><span>Getting there</span></div>
+        <div class="stat"><b style="color:var(--red)">${B.red.length}</b><span>Focus on</span></div>
+        <div class="stat"><b style="color:var(--ink-3)">${unseen + B.gry.length}</b><span>Not enough data</span></div>
+      </div>
+    </div>
+    ${(ao.A!==null && ao.B!==null) ? `<div class="bd" style="border-top:1px solid var(--rule);background:#FAFBFC">
+      <div class="row" style="gap:22px">
+        <div><span class="eyebrow">Remembering &amp; understanding</span>
+          <div class="mono" style="font-size:17px;font-weight:600">${pc(ao.A)}</div></div>
+        <div><span class="eyebrow">Applying &amp; problem-solving</span>
+          <div class="mono" style="font-size:17px;font-weight:600">${pc(ao.B)}</div></div>
+        <div class="grow sub" style="min-width:200px">${aoAdvice(ao)}</div>
+      </div></div>` : ''}
+  </div>
+
+  ${list('Focus on these first', 'Below 50% across two or more quizzes', B.red)}
+  ${list('Getting there', '50–74% · an arrow pointing up means you are improving', B.amb)}
+  ${list('Your strengths', '75% or more across two or more quizzes', B.grn)}
+  ${B.gry.length ? `<div class="card"><div class="top"><div><h2>Only tested once</h2>
+    <div class="eyebrow">One quiz isn't enough to judge, so these aren't weaknesses yet</div></div></div>
+    <div class="bd">${B.gry.map(([c,d])=>`<span class="tag ao-${lo(c).ao}" data-lo="${c}" style="cursor:pointer">${c} · ${pc(d.m)}</span>`).join('')}</div></div>` : ''}
+
+  <div class="card"><div class="top"><div><h2>By topic</h2></div></div>
+    <div class="bd flush scroll"><table><thead><tr><th>Topic</th><th class="num">Score</th><th class="num">Tested</th></tr></thead><tbody>
+    ${TOPICS.map(t=>{ const s = topicScore(mast,t);
+      return `<tr><td>${t}. ${esc(tName(t))}</td><td class="num">${s ? pc(s.m) : '—'}</td>
+        <td class="num" style="color:var(--ink-3)">${s ? s.cov+'/'+s.of : '0/'+Object.keys(SYL.topics[t].outcomes).length}</td></tr>`;
+    }).join('')}</tbody></table></div></div>
+
+  ${quizCard}`;
+
+  $id('rBody').querySelectorAll('[data-lo]').forEach(el => el.onclick = ()=> loDetail(el.dataset.lo, mast));
+}
+
+function loDetail(c, mast){
+  const d = mast[c], o = lo(c);
+  $id('dlgT').textContent = c+' — '+tName(LO_TOPIC[c]);
+  $id('dlgB').innerHTML = `
+    <p class="lo-txt" style="margin-bottom:12px;font-size:13px">${esc(o.text)}</p>
+    <p style="margin-bottom:12px"><span class="tag ao-${o.ao}">${o.ao==='A'?'Knowledge':'Application'}</span>
+      <span class="sub">${o.ao==='A'?'Remembering and understanding':'Using information to solve problems'}</span></p>
+    ${d ? `<div class="stats" style="margin-bottom:12px">
+        <div class="stat"><b>${pc(d.m)}</b><span>Score</span></div>
+        <div class="stat"><b>${d.n}</b><span>Times tested</span></div>
+        <div class="stat"><b>${arrow(d.trend)}</b><span>Trend</span></div></div>
+      <table><thead><tr><th>Quiz</th><th>Question</th><th class="num">Marks</th></tr></thead><tbody>
+      ${d.evidence.map(e=>`<tr><td>${esc((DB.quizzes[e.quiz]||{}).title||e.quiz)}<br>
+        <span class="mono" style="font-size:10px;color:var(--ink-3)">${esc(e.date)}</span></td>
+        <td class="mono">${esc(e.q)}</td><td class="num">${e.got}/${e.max}</td></tr>`).join('')}
+      </tbody></table>
+      ${d.n===1 ? '<div class="warn" style="margin-top:11px">Tested once so far. One quiz isn\'t enough to judge.</div>' : ''}`
+    : '<div class="warn">Not tested yet. Nothing to worry about — it just hasn\'t come up in a quiz.</div>'}`;
+  $id('dlg').showModal();
+}
+$id('dlgX').onclick = ()=> $id('dlg').close();
+
+/* ---- auth actions -------------------------------------------------------- */
+async function signIn(){
+  const btn = $id('inGo'), email = $id('inE').value.trim(), pw = $id('inP').value;
+  if(!email || !pw) return note('inMsg', 'Enter your email and password.');
+  busy(btn, true, 'Signing in…');
+  const { error } = await sb.auth.signInWithPassword({ email, password:pw });
+  busy(btn, false, 'Sign in');
+  if(error) return note('inMsg', friendly(error.message));
+  note('inMsg', '');
+  await enter();
+}
+async function signUp(){
+  const btn = $id('upGo');
+  const code = $id('upC').value.trim(), email = $id('upE').value.trim();
+  const pw = $id('upP').value, pw2 = $id('upP2').value;
+  if(code.replace(/[^A-Za-z0-9]/g,'').length < 6) return note('upMsg', 'Enter the join code your teacher gave you.');
+  if(!emailOk(email)) return note('upMsg', 'Enter a valid email address.');
+  if(pw.length < 8) return note('upMsg', 'Choose a password of at least 8 characters.');
+  if(pw !== pw2) return note('upMsg', 'The two passwords don\'t match.');
+  busy(btn, true, 'Creating account…');
+  const { data, error } = await sb.auth.signUp({ email, password:pw });
+  if(error){ busy(btn, false, 'Create account'); return note('upMsg', friendly(error.message)); }
+  if(!data.session){
+    busy(btn, false, 'Create account');
+    return note('upMsg', 'Account created. Check your email for a confirmation link, then sign in and enter your join code.', 'ok');
+  }
+  const r = await sb.rpc('claim_student', { code });
+  busy(btn, false, 'Create account');
+  if(r.error){ $id('lkC').value = code; show('link'); return note('lkMsg', friendly(r.error.message)); }
+  await enter();
+}
+async function linkCode(){
+  const btn = $id('lkGo'), code = $id('lkC').value.trim();
+  if(code.replace(/[^A-Za-z0-9]/g,'').length < 6) return note('lkMsg', 'Enter the join code your teacher gave you.');
+  busy(btn, true, 'Linking…');
+  const r = await sb.rpc('claim_student', { code });
+  busy(btn, false, 'Link my account');
+  if(r.error) return note('lkMsg', friendly(r.error.message));
+  await enter();
+}
+async function forgot(){
+  const btn = $id('fgGo'), email = $id('fgE').value.trim();
+  if(!emailOk(email)) return note('fgMsg', 'Enter the email you signed up with.');
+  busy(btn, true, 'Sending…');
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+  busy(btn, false, 'Send reset link');
+  if(error) return note('fgMsg', friendly(error.message));
+  note('fgMsg', 'If that email has an account, a reset link is on its way. It can take a few minutes, and check your spam folder.', 'ok');
+}
+async function newPassword(){
+  const btn = $id('npGo'), pw = $id('npP').value, pw2 = $id('npP2').value;
+  if(pw.length < 8) return note('npMsg', 'Choose a password of at least 8 characters.');
+  if(pw !== pw2) return note('npMsg', 'The two passwords don\'t match.');
+  busy(btn, true, 'Saving…');
+  const { error } = await sb.auth.updateUser({ password:pw });
+  busy(btn, false, 'Save new password');
+  if(error) return note('npMsg', friendly(error.message));
+  RECOVERY = false;
+  history.replaceState(null, '', location.pathname);
+  await enter();
+}
+async function signOut(){
+  try{ await sb.auth.signOut(); }catch(e){}
+  ME = null; DB = { students:{}, quizzes:{}, results:{} };
+  $id('who').textContent = ''; $id('btnOut').style.display = 'none';
+  $id('rBody').innerHTML = '';
+  show('in');
+}
+
+$id('inGo').onclick = signIn;
+$id('upGo').onclick = signUp;
+$id('lkGo').onclick = linkCode;
+$id('fgGo').onclick = forgot;
+$id('npGo').onclick = newPassword;
+$id('btnOut').onclick = signOut;
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = ()=>{
+  ['inMsg','upMsg','fgMsg'].forEach(id => note(id, ''));
+  show(b.dataset.go);
+});
+// Enter key submits the visible form
+document.querySelectorAll('.auth input').forEach(i => i.addEventListener('keydown', e=>{
+  if(e.key !== 'Enter') return;
+  e.preventDefault();
+  const btn = i.closest('.bd').querySelector('.btn.pri'); if(btn && !btn.disabled) btn.click();
+}));
+
+boot().catch(e => fatal(friendly(e.message)));
+</script>
+</body>
+</html>
